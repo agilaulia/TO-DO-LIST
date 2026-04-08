@@ -15,14 +15,14 @@ const fetchWithRetry = async (url: string, options: RequestInit, retries = 2): P
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url, options);
-      if (response.ok || (response.status >= 400 && response.status < 500)) {
+      if (response.ok || (response.status >= 400 && response.status < 500 && response.status !== 429)) {
         return response;
       }
       console.warn(`Percobaan ${i + 1} gagal (Status: ${response.status}). Mengulang kembali...`);
     } catch (err) {
       console.warn(`Percobaan ${i + 1} error jaringan. Mengulang kembali...`, err);
     }
-    await new Promise(r => setTimeout(r, 1500)); // wait 1.5s before retrying
+    await new Promise(r => setTimeout(r, 2500)); // wait 2.5s before retrying to clear rate limit burst
   }
   return fetch(url, options);
 };
