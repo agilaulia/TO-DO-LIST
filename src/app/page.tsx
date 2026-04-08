@@ -295,7 +295,6 @@ export default function Home() {
           <input
             type="file"
             accept="image/*"
-            capture="environment"
             ref={fileInputRef}
             className="hidden"
             onChange={handleScan}
@@ -404,7 +403,6 @@ export default function Home() {
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               ref={updateFileInputRef}
               className="hidden"
               onChange={handleUpdateStatusScan}
