@@ -224,10 +224,10 @@ export default function Home() {
   }, {} as Record<string, { originalName: string; items: VehicleEntry[] }>);
 
   return (
-    <main className="w-full min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8">
+    <main className="w-full min-h-screen p-3 sm:p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8 overflow-x-hidden">
       {/* Header */}
-      <header className="text-center mt-4 md:mt-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gradient mb-2 pb-1 drop-shadow-sm">
+      <header className="text-center mt-4 md:mt-8 px-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gradient mb-2 pb-1 drop-shadow-sm">
           Vehicle To-Do List
         </h1>
         <p className="text-slate-600 dark:text-slate-300 font-medium">
@@ -239,7 +239,7 @@ export default function Home() {
       <div className="flex flex-col gap-10 items-center w-full">
 
         {/* Input Panel */}
-        <section className="glass-panel w-full max-w-2xl mx-auto p-6 md:p-8 rounded-3xl flex flex-col gap-5 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+        <section className="glass-panel w-full max-w-2xl mx-auto p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl flex flex-col gap-4 sm:gap-5 relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
           <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
@@ -253,7 +253,7 @@ export default function Home() {
               value={namaPT}
               onChange={(e) => setNamaPT(e.target.value)}
               placeholder="Cth: PT Alam Makmur"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-inner"
+              className="w-full px-4 py-3 text-base rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-inner"
             />
           </div>
 
@@ -264,7 +264,7 @@ export default function Home() {
               value={nomorPlat}
               onChange={(e) => setNomorPlat(e.target.value)}
               placeholder="Cth: B 1234 CD, D 9999 XX"
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 uppercase shadow-inner"
+              className="w-full px-4 py-3 text-base rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 uppercase shadow-inner"
             />
             <span className="text-[10px] text-slate-500 italic mt-0.5 ml-1">Bisa lebih dari 1, pisahkan dengan koma (,)</span>
           </div>
@@ -300,12 +300,12 @@ export default function Home() {
 
         {/* Rekap Panel */}
         {entries.length > 0 && (
-          <section className="glass-panel w-full max-w-7xl mx-auto p-6 md:p-8 rounded-3xl flex flex-col gap-5 shadow-lg">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
-              <span className="w-2 h-6 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></span>
+          <section className="glass-panel w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl flex flex-col gap-4 sm:gap-5 shadow-lg">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1 sm:mb-2 flex items-center gap-2">
+              <span className="w-2 h-5 sm:h-6 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></span>
               Rekap Status Kendaraan
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {Object.values(groupedEntries).map((group) => {
                 const activeItems = group.items.filter((item) => item.status === 'Active');
                 const inactiveItems = group.items.filter((item) => item.status === 'Inactive');
@@ -361,7 +361,7 @@ export default function Home() {
         )}
 
         {/* List Panel */}
-        <section className="glass-panel w-full p-6 md:p-8 rounded-3xl flex flex-col gap-4 shadow-lg">
+        <section className="glass-panel w-full p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl flex flex-col gap-4 shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
               <span>Daftar Kendaraan</span>
@@ -388,7 +388,7 @@ export default function Home() {
             />
           </div>
 
-          <div className={`overflow-y-auto h-[700px] pr-1 custom-scrollbar ${entries.length === 0 ? 'flex flex-col' : ''}`}>
+          <div className={`overflow-y-auto max-h-[65vh] md:h-[700px] md:max-h-none pr-1 sm:pr-2 custom-scrollbar ${entries.length === 0 ? 'flex flex-col' : ''}`}>
             {entries.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 min-h-[300px] border-2 border-dashed border-slate-200/60 dark:border-slate-700/60 rounded-2xl">
                 <Upload className="w-12 h-12 mb-3 opacity-30" />
