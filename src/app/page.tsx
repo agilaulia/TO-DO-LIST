@@ -11,6 +11,22 @@ type VehicleEntry = {
   status: "Active" | "Inactive";
 };
 
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 2): Promise<Response> => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok || (response.status >= 400 && response.status < 500)) {
+        return response;
+      }
+      console.warn(`Percobaan ${i + 1} gagal (Status: ${response.status}). Mengulang kembali...`);
+    } catch (err) {
+      console.warn(`Percobaan ${i + 1} error jaringan. Mengulang kembali...`, err);
+    }
+    await new Promise(r => setTimeout(r, 1500)); // wait 1.5s before retrying
+  }
+  return fetch(url, options);
+};
+
 export default function Home() {
   const [entries, setEntries] = useState<VehicleEntry[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -63,11 +79,11 @@ export default function Home() {
         reader.onerror = reject;
       });
 
-      const response = await fetch('/api/extract', {
+      const response = await fetchWithRetry('/api/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: base64Data }),
-      });
+      }, 2); // 2 retries allowed
 
       if (!response.ok) {
         let errorMsg = `Server API Error (${response.status})`;
@@ -95,9 +111,9 @@ export default function Home() {
           setNomorPlat(formatPlatNomor(data.nomorPlat));
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Scan error details:", error);
-      alert(`Terjadi kesalahan sistem: ${error.message}`);
+      alert(`Terjadi kesalahan sistem: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -122,14 +138,21 @@ export default function Home() {
         reader.onerror = reject;
       });
 
-      const response = await fetch('/api/extract', {
+      const response = await fetchWithRetry('/api/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: base64Data }),
-      });
+      }, 2); // 2 retries allowed
 
       if (!response.ok) {
-        throw new Error("Server API Error");
+        let errorMsg = `Server API Error (${response.status})`;
+        try {
+          const errData = await response.json();
+          if (errData.error) errorMsg = errData.error;
+        } catch {
+          errorMsg = await response.text();
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -171,8 +194,8 @@ export default function Home() {
 
         alert(`Berhasil memperbarui status kendaraan! Plat terdeteksi mendapat status Active.`);
       }
-    } catch (error: any) {
-      alert(`Terjadi kesalahan sistem: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Terjadi kesalahan sistem: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsUpdatingStatus(false);
       if (updateFileInputRef.current) updateFileInputRef.current.value = "";

@@ -18,9 +18,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === "") {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured" },
+        { error: "Kunci API Gemini (GEMINI_API_KEY) belum diisi dengan benar di file .env.local" },
         { status: 500 }
       );
     }
