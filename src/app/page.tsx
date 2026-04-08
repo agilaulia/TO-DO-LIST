@@ -251,10 +251,10 @@ export default function Home() {
       {/* Header */}
       <header className="text-center mt-4 md:mt-8 px-2">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gradient mb-2 pb-1 drop-shadow-sm">
-          Vehicle To-Do List
+          Unit To-Do List
         </h1>
         <p className="text-slate-600 dark:text-slate-300 font-medium">
-          Sistem Pencatatan Kendaraan Otomatis
+          Sistem Pencatatan Unit Otomatis
         </p>
       </header>
 
@@ -266,7 +266,7 @@ export default function Home() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
           <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
-            Input Data Baru
+            Input Unit
           </h2>
 
           <div className="flex flex-col gap-1.5">
@@ -398,7 +398,7 @@ export default function Home() {
               className="bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-800/60 text-indigo-700 dark:text-indigo-300 py-2 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors border border-indigo-200 dark:border-indigo-700 disabled:opacity-50 text-sm w-full sm:w-auto shadow-sm"
             >
               {isUpdatingStatus ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-              {isUpdatingStatus ? "Memproses..." : "Scan Foto Aktif"}
+              {isUpdatingStatus ? "Memproses..." : "Scan Foto Unit Aktif"}
             </button>
             <input
               type="file"
