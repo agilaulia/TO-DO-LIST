@@ -9,6 +9,7 @@ type VehicleEntry = {
   nomorPlat: string;
   timestamp: string;
   status: "Active" | "Inactive";
+  kegiatanKapal?: string;
 };
 
 const fetchWithRetry = async (url: string, options: RequestInit, retries = 2): Promise<Response> => {
@@ -32,6 +33,8 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [namaPT, setNamaPT] = useState("");
   const [nomorPlat, setNomorPlat] = useState("");
+  const [kegiatanKapalInput, setKegiatanKapalInput] = useState("");
+  const [activeKapalTab, setActiveKapalTab] = useState("Semua");
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -203,8 +206,8 @@ export default function Home() {
   };
 
   const handleSave = () => {
-    if (!namaPT || !nomorPlat) {
-      alert("Harap isi Nama PT dan Nomor Plat");
+    if (!kegiatanKapalInput || !namaPT || !nomorPlat) {
+      alert("Harap isi Kegiatan Kapal, Nama PT, dan Nomor Plat");
       return;
     }
 
@@ -216,6 +219,7 @@ export default function Home() {
       nomorPlat: formatPlatNomor(plat),
       timestamp: new Date().toLocaleString("id-ID"),
       status: "Inactive",
+      kegiatanKapal: kegiatanKapalInput.trim(),
     }));
 
     setEntries([...newEntries, ...entries]);
@@ -237,7 +241,13 @@ export default function Home() {
     setEntries(entries.filter((entry) => entry.id !== id));
   };
 
-  const groupedEntries = entries.reduce((acc, entry) => {
+  const availableKapal = Array.from(new Set(entries.map(e => e.kegiatanKapal?.trim() || "Umum"))).sort();
+
+  const filteredEntries = activeKapalTab === "Semua" 
+    ? entries 
+    : entries.filter((entry) => (entry.kegiatanKapal?.trim() || "Umum") === activeKapalTab);
+
+  const groupedEntries = filteredEntries.reduce((acc, entry) => {
     const key = entry.namaPT.trim().toUpperCase();
     if (!acc[key]) {
       acc[key] = { originalName: entry.namaPT.trim(), items: [] };
@@ -268,6 +278,17 @@ export default function Home() {
           <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
             Input Unit
           </h2>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Kegiatan Kapal</label>
+            <input
+              type="text"
+              value={kegiatanKapalInput}
+              onChange={(e) => setKegiatanKapalInput(e.target.value)}
+              placeholder="Cth: Kapal A, Kapal B"
+              className="w-full px-4 py-3 text-base rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-400 shadow-inner"
+            />
+          </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Nama PT</label>
@@ -320,8 +341,37 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Navigasi Tabs Kegiatan Kapal */}
+        {entries.length > 0 && availableKapal.length > 0 && (
+          <div className="w-full max-w-7xl mx-auto flex flex-wrap gap-2 justify-center mt-2 mb-2">
+            <button
+              onClick={() => setActiveKapalTab("Semua")}
+              className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all shadow-sm ${
+                activeKapalTab === "Semua"
+                  ? "bg-indigo-600 text-white shadow-md transform scale-105"
+                  : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 shadow"
+              }`}
+            >
+              Semua Kapal
+            </button>
+            {availableKapal.map(kapal => (
+              <button
+                key={kapal}
+                onClick={() => setActiveKapalTab(kapal)}
+                className={`px-5 py-2.5 rounded-full font-bold text-sm transition-all shadow-sm ${
+                  activeKapalTab === kapal
+                    ? "bg-indigo-600 text-white shadow-md transform scale-105"
+                    : "bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 shadow"
+                }`}
+              >
+                {kapal}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Rekap Panel */}
-        {entries.length > 0 && (
+        {filteredEntries.length > 0 && (
           <section className="glass-panel w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl flex flex-col gap-4 sm:gap-5 shadow-lg">
             <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1 sm:mb-2 flex items-center gap-2">
               <span className="w-2 h-5 sm:h-6 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></span>
@@ -386,9 +436,9 @@ export default function Home() {
         <section className="glass-panel w-full p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-3xl flex flex-col gap-4 shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
-              <span>Daftar Kendaraan</span>
+              <span>Daftar Kendaraan {activeKapalTab !== "Semua" ? `(${activeKapalTab})` : ""}</span>
               <span className="text-sm font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 py-1 px-3 rounded-full">
-                {entries.length} Entri
+                {filteredEntries.length} Entri
               </span>
             </h2>
 
@@ -409,11 +459,11 @@ export default function Home() {
             />
           </div>
 
-          <div className={`overflow-y-auto max-h-[65vh] md:h-[700px] md:max-h-none pr-1 sm:pr-2 custom-scrollbar ${entries.length === 0 ? 'flex flex-col' : ''}`}>
-            {entries.length === 0 ? (
+          <div className={`overflow-y-auto max-h-[65vh] md:h-[700px] md:max-h-none pr-1 sm:pr-2 custom-scrollbar ${filteredEntries.length === 0 ? 'flex flex-col' : ''}`}>
+            {filteredEntries.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 min-h-[300px] border-2 border-dashed border-slate-200/60 dark:border-slate-700/60 rounded-2xl">
                 <Upload className="w-12 h-12 mb-3 opacity-30" />
-                <p className="font-medium text-slate-500 dark:text-slate-400">Belum ada data kendaraan.</p>
+                <p className="font-medium text-slate-500 dark:text-slate-400">Belum ada data kendaraan{activeKapalTab !== "Semua" ? ` untuk ${activeKapalTab}` : ""}.</p>
                 <p className="text-sm mt-1">Scan foto atau input manual untuk memulai.</p>
               </div>
             ) : (
